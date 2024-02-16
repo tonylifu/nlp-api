@@ -57,6 +57,35 @@ public class AzureApiService implements HttpService {
         return apiResponse;
     }
 
+    @Override
+    public void postApiRequestAsync(String jsonRequest, String endpoint) {
+        log.info("\n:::Request:::\n{}\n", jsonRequest);
+        try(HttpClient client = HttpClient.newHttpClient()) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .header(apiKeyName, apiKeyValue)
+                    .uri(URI.create(baseUrl+endpoint))
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
+                    .build();
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(result -> ApiResponse.builder()
+                            .responseBody(result.body())
+                            .statusCode(result.statusCode())
+                            .headers(result.headers())
+                            .build())
+                    .thenAccept(apiResult -> {
+                        System.out.println("***********************************************");
+                        log.info("\n::::::::::::::::API-Response::::::::::::::::::::\nStatus Code => {}\n Headers Info => {}\n Response => {}\n",
+                                apiResult.statusCode(), apiResult.headers(), apiResult.responseBody());
+                        System.out.println("***********************************************");
+                    });
+
+
+        } catch (Exception e) {
+            var errorMsg = "failed http client request <=> "+ e.getMessage();
+            log.error(errorMsg);
+        }
+    }
+
     private String getErrorMsg(String errorMsg) {
         return String.format("{'status': %s}", errorMsg);
     }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TextAnalytics implements TextAnalyticService {
+public class TextAnalytics implements TextAnalyticService, TextAnalyticServiceAsync {
     private final HttpService httpService;
     @Value("${azure.api.endpoint.sentiment}")
     private String sentimentEndPoint;
@@ -36,5 +36,10 @@ public class TextAnalytics implements TextAnalyticService {
     @Override
     public ApiResponse namedEntities(String request) {
         return httpService.postApiRequest(request, namedEntities);
+    }
+
+    @Override
+    public void namedEntitiesAsync(String request) {
+        httpService.postApiRequestAsync(request, namedEntities);
     }
 }

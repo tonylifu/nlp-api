@@ -17,6 +17,7 @@ public class TextAnalyticsController {
     private static final String SENTIMENT_PATH = "/api/v1/sentiment";
     private static final String LANGUAGE_PATH = "/api/v1/language";
     private static final String KEYPHRASES_PATH = "/api/v1/keyphrases";
+    private static final String NAMED_ENTITIES_PATH = "/api/v1/namedentities";
 
     @PostMapping(value = SENTIMENT_PATH)
     public ResponseEntity<?> extractSentiments(@RequestBody final String request) {
@@ -33,6 +34,12 @@ public class TextAnalyticsController {
     @PostMapping(value = KEYPHRASES_PATH)
     public ResponseEntity<?> keyPhrases(@RequestBody final String request) {
         var response = textAnalyticService.keyPhrasesDetection(request);
+        return getResponse(response);
+    }
+
+    @PostMapping(value = NAMED_ENTITIES_PATH)
+    public ResponseEntity<?> namedEntities(@RequestBody final String request) {
+        var response = textAnalyticService.namedEntities(request);
         return getResponse(response);
     }
 

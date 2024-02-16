@@ -1,13 +1,17 @@
 package com.lifu.analytics.api.http;
 
+import com.lifu.analytics.api.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -19,8 +23,9 @@ public class AzureApiService implements HttpService {
     @Value("${azure.api.key.value}")
     private String apiKeyValue;
     @Override
-    public String postApiRequest(String jsonRequest, String endpoint) {
-        String result = "";
+    public ApiResponse postApiRequest(String jsonRequest, String endpoint) {
+        log.info("\n:::Request:::\n{}\n", jsonRequest);
+        ApiResponse apiResponse;
         try(HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                     .header(apiKeyName, apiKeyValue)
@@ -28,13 +33,28 @@ public class AzureApiService implements HttpService {
                     .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            result = response.body();
+            apiResponse = ApiResponse.builder()
+                    .responseBody(response.body())
+                    .statusCode(response.statusCode())
+                    .headers(response.headers())
+                    .build();
         } catch (Exception e) {
             var errorMsg = "failed http client request <=> "+ e.getMessage();
             log.error(errorMsg);
-            result = getErrorMsg(errorMsg);
+            Map<String, List<String>> headersMap = Map.of(
+                    "status", List.of("400"),
+                    "Error-Message", List.of("Failed Request")
+            );
+            HttpHeaders headers = HttpHeaders.of(headersMap, (name, value) -> true);
+            apiResponse = ApiResponse.builder()
+                    .responseBody(getErrorMsg(errorMsg))
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .headers(headers)
+                    .build();
         }
-        return result;
+        log.info("\n:::Response:::\nStatus Code => {}\n Headers Info => {}\n Response => {}\n",
+                apiResponse.statusCode(), apiResponse.headers(), apiResponse.responseBody());
+        return apiResponse;
     }
 
     private String getErrorMsg(String errorMsg) {

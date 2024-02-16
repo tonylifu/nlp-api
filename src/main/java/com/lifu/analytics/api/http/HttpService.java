@@ -1,5 +1,7 @@
 package com.lifu.analytics.api.http;
 
+import com.lifu.analytics.api.dto.response.ApiResponse;
+
 public interface HttpService {
-    String postApiRequest(String jsonRequest, String endpoint);
+    ApiResponse postApiRequest(String jsonRequest, String endpoint);
 }

@@ -16,6 +16,8 @@ public class TextAnalytics implements TextAnalyticService {
     private String languageEndPoint;
     @Value("${azure.api.endpoint.keyphrases}")
     private String keyPhrasesEndPoint;
+    @Value("${azure.api.endpoint.named-entities}")
+    private String namedEntities;
     @Override
     public ApiResponse extractSentiments(String request) {
         return httpService.postApiRequest(request, sentimentEndPoint);
@@ -29,5 +31,10 @@ public class TextAnalytics implements TextAnalyticService {
     @Override
     public ApiResponse keyPhrasesDetection(String request) {
         return httpService.postApiRequest(request, keyPhrasesEndPoint);
+    }
+
+    @Override
+    public ApiResponse namedEntities(String request) {
+        return httpService.postApiRequest(request, namedEntities);
     }
 }

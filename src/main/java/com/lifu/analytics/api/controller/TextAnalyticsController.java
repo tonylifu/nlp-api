@@ -25,26 +25,22 @@ public class TextAnalyticsController {
 
     @PostMapping(value = SENTIMENT_PATH)
     public ResponseEntity<?> extractSentiments(@RequestBody final String request) {
-        var response = textAnalyticService.extractSentiments(request);
-        return getResponse(response);
+        return getResponse(textAnalyticService.extractSentiments(request));
     }
 
     @PostMapping(value = LANGUAGE_PATH)
     public ResponseEntity<?> languageDetection(@RequestBody final String request) {
-        var response = textAnalyticService.languageDetection(request);
-        return getResponse(response);
+        return getResponse(textAnalyticService.languageDetection(request));
     }
 
     @PostMapping(value = KEYPHRASES_PATH)
     public ResponseEntity<?> keyPhrases(@RequestBody final String request) {
-        var response = textAnalyticService.keyPhrasesDetection(request);
-        return getResponse(response);
+        return getResponse(textAnalyticService.keyPhrasesDetection(request));
     }
 
     @PostMapping(value = NAMED_ENTITIES_PATH)
     public ResponseEntity<?> namedEntities(@RequestBody final String request) {
-        var response = textAnalyticService.namedEntities(request);
-        return getResponse(response);
+        return getResponse(textAnalyticService.namedEntities(request));
     }
 
     //async call on named entities
